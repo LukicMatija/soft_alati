@@ -22,11 +22,29 @@ public class TournamentService {
 
     @Transactional
     public TournamentResponseDto createTournament(TournamentAddDto tournamentAdd){
-        System.out.println(tournamentAdd);
         City city = cityRepository.findById(tournamentAdd.cityId())
                 .orElseThrow(() -> new EntityNotFoundException("City not found"));
         Tournament t = tournamentAdd.toEntity();
         t.setCity(city);
         return TournamentResponseDto.fromEntity(tournamentRepository.save(t));
+    }
+
+    @Transactional
+    public TournamentResponseDto updateTournament(Long id, TournamentAddDto tournamentUpdate){
+        Tournament t = tournamentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Tournament not found"));
+        City city = cityRepository.findById(tournamentUpdate.cityId())
+                .orElseThrow(() -> new EntityNotFoundException("City not found"));
+        t.setCity(city);
+        t.setName(tournamentUpdate.name());
+        t.setPrizePool(tournamentUpdate.prizePool());
+        return TournamentResponseDto.fromEntity(tournamentRepository.save(t));
+    }
+
+    @Transactional
+    public void deleteTournament(Long id){
+        Tournament t = tournamentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Tournament not found"));
+        tournamentRepository.delete(t);
     }
 }
