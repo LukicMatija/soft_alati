@@ -3,6 +3,7 @@ package rs.fon.bg.ac.rs.lukic_matija.services;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import rs.fon.bg.ac.rs.lukic_matija.domain.City;
 import rs.fon.bg.ac.rs.lukic_matija.domain.Team;
 import rs.fon.bg.ac.rs.lukic_matija.dtos.teamDtos.TeamAddDto;
@@ -19,7 +20,7 @@ public class TeamService {
         this.teamRepository = teamRepository;
         this.cityRepository = cityRepository;
     }
-
+    @Transactional
     public TeamResponseDto create(TeamAddDto teamAdd){
         City c = cityRepository.findById(teamAdd.cityId())
                 .orElseThrow(()-> new EntityNotFoundException("City doesnt exist"));
