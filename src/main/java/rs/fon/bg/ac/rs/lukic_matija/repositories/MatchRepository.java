@@ -8,6 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MatchRepository extends JpaRepository<Match,Long> {
-    Optional<Match> findByIdAndTournamentId(Long id, Long teamId);
+    Optional<Match> findByIdAndTournamentId(Long id, Long tourId);
     List<Match> findAllByPhase(MatchPhase phase);
 }
