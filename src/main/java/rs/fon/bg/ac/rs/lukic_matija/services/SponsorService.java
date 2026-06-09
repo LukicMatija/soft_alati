@@ -23,6 +23,9 @@ public class SponsorService {
 
     @Transactional
     public SponsorResponseDto create(SponsorAddDto sAdd){
+        if (sponsorRepository.existsByCompanyAndTournamentId(sAdd.company(), sAdd.tournamentId())) {
+            throw new IllegalArgumentException("Company " + sAdd.company() + " is already sponsor for this tournament");
+        }
         Tournament t = tournamentRepository.findById(sAdd.tournamentId())
                 .orElseThrow(()-> new EntityNotFoundException("Tournament doesnt exist"));
         Sponsor s = sAdd.toEntity();
