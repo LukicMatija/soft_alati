@@ -31,6 +31,16 @@ public class MatchService {
 
     @Transactional
     public MatchResponseDto create(MatchAddDto matchAdd){
+
+        MatchPhase phase = MatchPhase.valueOf(matchAdd.phase());
+        if (matchAdd.homeTeamId().equals(matchAdd.awayTeamId())) {
+            throw new IllegalArgumentException("Same team for home and away");
+        }
+        validirajMaksimalanBrojMeceva(matchAdd.tournamentId(), phase);
+
+        proveriDaLiJeTimIspao(matchAdd.tournamentId(), matchAdd.homeTeamId(), phase);
+        proveriDaLiJeTimIspao(matchAdd.tournamentId(), matchAdd.awayTeamId(), phase);
+
         Team homeTeam = teamRepository.findById(matchAdd.homeTeamId())
                 .orElseThrow(()-> new EntityNotFoundException("Home team doesnt exist"));
         Team awayTeam = teamRepository.findById(matchAdd.awayTeamId())
@@ -60,5 +70,50 @@ public class MatchService {
             responseList.add(MatchResponseDto.fromEntity(m));
         }
         return responseList;
+    }
+    private void validirajMaksimalanBrojMeceva(Long tournamentId, MatchPhase faza) {
+        long brojMecevaUFazi = matchRepository.countByTournamentIdAndPhase(tournamentId, faza);
+
+        int maksimalnoMeceva = switch (faza) {
+            case FINALS -> 1;
+            case SEMIFINALS -> 2;
+            case QUARTERFINALS -> 4;
+        };
+
+        if (brojMecevaUFazi >= maksimalnoMeceva) {
+            throw new IllegalArgumentException("Faza " + faza + " na ovom turniru vec ima maksimalan broj meceva (" + maksimalnoMeceva + ")!");
+        }
+    }
+
+    private void proveriDaLiJeTimIspao(Long tournamentId, Long teamId, MatchPhase trenutnaFaza) {
+        MatchPhase prethodnaFaza = vratiPrethodnuFazu(trenutnaFaza);
+        if (prethodnaFaza == null) {
+            return;
+        }
+
+        List<Match> prethodniMecevi = matchRepository.findByTournamentIdAndPhaseAndTeamId(tournamentId, prethodnaFaza, teamId);
+
+        for (Match stariMec : prethodniMecevi) {
+            if (!stariMec.isPlayed()) {
+                throw new IllegalArgumentException("Tim sa ID " + teamId + " jos uvek nije odigrao mec u fazi " + prethodnaFaza);
+            }
+
+            boolean jeDomacin = stariMec.getHomeTeam().getId().equals(teamId);
+
+            if (jeDomacin && stariMec.getHomePoints() < stariMec.getAwayPoints()) {
+                throw new IllegalArgumentException("Tim " + stariMec.getHomeTeam().getName() + " je ispao u fazi " + prethodnaFaza);
+            }
+            if (!jeDomacin && stariMec.getAwayPoints() < stariMec.getHomePoints()) {
+                throw new IllegalArgumentException("Tim " + stariMec.getAwayTeam().getName() + " je ispao u fazi " + prethodnaFaza);
+            }
+        }
+    }
+
+    private MatchPhase vratiPrethodnuFazu(MatchPhase trenutnaFaza) {
+        return switch (trenutnaFaza) {
+            case FINALS -> MatchPhase.SEMIFINALS;
+            case SEMIFINALS -> MatchPhase.QUARTERFINALS;
+            case QUARTERFINALS -> null;
+        };
     }
 }
