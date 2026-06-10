@@ -11,6 +11,12 @@ import rs.fon.bg.ac.rs.lukic_matija.dtos.teamDtos.TeamResponseDto;
 import rs.fon.bg.ac.rs.lukic_matija.repositories.CityRepository;
 import rs.fon.bg.ac.rs.lukic_matija.repositories.TeamRepository;
 
+/**
+ * Service for managing football teams.
+ * Handles team registration and ensures that every team is associated
+ * with an existing city.
+ * @author Matija Lukic
+ */
 @Service
 public class TeamService {
     private final TeamRepository teamRepository;
@@ -20,6 +26,14 @@ public class TeamService {
         this.teamRepository = teamRepository;
         this.cityRepository = cityRepository;
     }
+    /**
+     * Creates a new team and associates it with an existing city.
+     *
+     * @param teamAdd TeamAddDto data transfer object containing team information
+     * and the identifier of the city the team represents.
+     * @return TeamResponseDto containing the details of the successfully created team.
+     * @throws jakarta.persistence.EntityNotFoundException If the specified city cannot be found.
+     */
     @Transactional
     public TeamResponseDto create(TeamAddDto teamAdd){
         City c = cityRepository.findById(teamAdd.cityId())

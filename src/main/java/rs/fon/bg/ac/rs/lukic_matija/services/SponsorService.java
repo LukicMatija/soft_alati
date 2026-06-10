@@ -11,6 +11,12 @@ import rs.fon.bg.ac.rs.lukic_matija.dtos.sponsorDtos.SponsorResponseDto;
 import rs.fon.bg.ac.rs.lukic_matija.repositories.SponsorRepository;
 import rs.fon.bg.ac.rs.lukic_matija.repositories.TournamentRepository;
 
+/**
+ * Service for managing tournament sponsorships.
+ * Handles sponsor registrations and ensures that sponsorship agreements
+ * comply with business rules and tournament associations.
+ * @author Matija Lukic
+ */
 @Service
 public class SponsorService {
     private final SponsorRepository sponsorRepository;
@@ -21,6 +27,19 @@ public class SponsorService {
         this.tournamentRepository = tournamentRepository;
     }
 
+    /**
+     * Creates a new sponsorship agreement for a tournament.
+     * Validates that the sponsorship budget is greater than zero through DTO validation
+     * and ensures that the same company cannot be registered more than once as a sponsor
+     * of the same tournament.
+     *
+     * @param sAdd SponsorAddDto data transfer object containing sponsor company information,
+     * sponsorship budget, signing date, and tournament identifier.
+     * @return SponsorResponseDto containing the details of the successfully created sponsorship.
+     * @throws java.lang.IllegalArgumentException If the company is already registered as a sponsor
+     * for the specified tournament.
+     * @throws jakarta.persistence.EntityNotFoundException If the specified tournament cannot be found.
+     */
     @Transactional
     public SponsorResponseDto create(SponsorAddDto sAdd){
         if (sponsorRepository.existsByCompanyAndTournamentId(sAdd.company(), sAdd.tournamentId())) {

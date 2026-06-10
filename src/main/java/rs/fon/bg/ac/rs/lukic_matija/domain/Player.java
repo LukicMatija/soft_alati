@@ -3,6 +3,13 @@ package rs.fon.bg.ac.rs.lukic_matija.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+
+/**
+ * Represents an individual athlete or player registered within the system.
+ * Contains personal detail attributes, field positions, jersey numbers,
+ * health/injury status, and maps the relationship to their current sports team.
+ * @author Matija Lukic
+ */
 @Entity
 @Table(name = "player")
 @Data
@@ -11,23 +18,47 @@ import lombok.*;
 @Builder
 public class Player {
 
+    /**
+     * Unique identifier for the player.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * The first name of the player.
+     * This field is mandatory and cannot be null.
+     */
     @Column(nullable = false)
     private String firstName;
 
+    /**
+     * The last name of the player.
+     * This field is mandatory and cannot be null.
+     */
     @Column(nullable = false)
     private String lastName;
 
+    /**
+     * The playing position of the player on the field (e.g., Striker, Midfielder, Defender).
+     */
     private String position;
 
+    /**
+     * The squad or jersey number assigned to the player within their team.
+     */
     @Column(name = "jersey_number")
     private int jerseyNumber;
 
+    /**
+     * Indicates whether the player is currently injured and unavailable for matches.
+     */
     private boolean injured;
 
+    /**
+     * The sports team that the player currently belongs to.
+     * This field is mandatory and lazy-loaded.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id", nullable = false)
     private Team team;
