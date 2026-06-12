@@ -1,6 +1,7 @@
 package rs.fon.bg.ac.rs.lukic_matija.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -49,12 +50,14 @@ public class Match {
     /**
      * The total points or score accumulated by the home team.
      */
+    @Min(value = 0, message = "Home team points cannot be negative")
     @Column(name = "home_points")
     private int homePoints;
 
     /**
      * The total points or score accumulated by the away team.
      */
+    @Min(value = 0, message = "Away team points cannot be negative")
     @Column(name = "away_points")
     private int awayPoints;
 
