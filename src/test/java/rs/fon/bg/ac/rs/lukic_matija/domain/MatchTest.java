@@ -44,9 +44,9 @@ class MatchTest {
 
     @ParameterizedTest
     @CsvSource({
-            "QUARTERFINALS, 85, 82, true",
-            "SEMIFINALS, 90, 95, true",
-            "FINALS, 0, 0, false" // Primer kada meč tek treba da se odigra
+            "QUARTERFINALS, 0, 2, true",
+            "SEMIFINALS, 1, 3, true",
+            "FINALS, 0, 0, false"
     })
     @DisplayName("Should pass validation with perfectly structured match parameters")
     void validate_ValidMatches_NoViolations(String phaseStr, int homePoints, int awayPoints, boolean played) {
@@ -76,7 +76,7 @@ class MatchTest {
         Match match = Match.builder()
                 .phase(MatchPhase.FINALS)
                 .homePoints(invalidPoints)
-                .awayPoints(80)
+                .awayPoints(3)
                 .build();
 
         Set<ConstraintViolation<Match>> violations = validator.validate(match);
@@ -91,7 +91,7 @@ class MatchTest {
     void validate_InvalidAwayPoints_HasViolations(int invalidPoints) {
         Match match = Match.builder()
                 .phase(MatchPhase.SEMIFINALS)
-                .homePoints(90)
+                .homePoints(3)
                 .awayPoints(invalidPoints)
                 .build();
 
@@ -111,8 +111,8 @@ class MatchTest {
         match.setScheduleTime(time);
         match.setPlayed(true);
         match.setPhase(MatchPhase.FINALS);
-        match.setHomePoints(101);
-        match.setAwayPoints(99);
+        match.setHomePoints(1);
+        match.setAwayPoints(3);
         match.setTournament(mockTournament);
         match.setHomeTeam(mockHomeTeam);
         match.setAwayTeam(mockAwayTeam);
@@ -122,8 +122,8 @@ class MatchTest {
         assertEquals(time, match.getScheduleTime());
         assertTrue(match.isPlayed());
         assertEquals(MatchPhase.FINALS, match.getPhase());
-        assertEquals(101, match.getHomePoints());
-        assertEquals(99, match.getAwayPoints());
+        assertEquals(1, match.getHomePoints());
+        assertEquals(3, match.getAwayPoints());
 
         assertEquals(mockTournament, match.getTournament());
         assertEquals(mockHomeTeam, match.getHomeTeam());
