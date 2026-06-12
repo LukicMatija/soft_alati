@@ -49,6 +49,7 @@ public class Match {
 
     /**
      * The total points or score accumulated by the home team.
+     * This field can not be negative
      */
     @Min(value = 0, message = "Home team points cannot be negative")
     @Column(name = "home_points")
@@ -56,6 +57,7 @@ public class Match {
 
     /**
      * The total points or score accumulated by the away team.
+     * This field can not be negative
      */
     @Min(value = 0, message = "Away team points cannot be negative")
     @Column(name = "away_points")
