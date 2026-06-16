@@ -1,6 +1,8 @@
 package rs.fon.bg.ac.rs.lukic_matija.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import java.util.List;
 
@@ -28,12 +30,16 @@ public class City {
      * The name of the city.
      * This field is mandatory and cannot be null.
      */
+    @NotBlank(message = "City name cannot be blank")
+    @Size(max = 100, message = "City name cannot exceed 100 characters")
     @Column(nullable = false)
     private String name;
 
     /**
      * The postal or zip code associated with the city.
      */
+    @NotBlank(message = "Postal code cannot be blank")
+    @Size(max = 5, message = "Postal code cannot exceed 5 characters")
     @Column(name = "postal_code")
     private String postalCode;
 

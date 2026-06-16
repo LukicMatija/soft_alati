@@ -1,6 +1,10 @@
 package rs.fon.bg.ac.rs.lukic_matija.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 
@@ -27,12 +31,16 @@ public class Delegation {
     /**
      * The specific role assigned to the referee for the match (e.g., Main Referee, Assistant Referee).
      */
+    @NotBlank(message = "Referee role cannot be blank")
+    @Size(max = 50, message = "Referee role cannot exceed 50 characters")
     @Column(name = "referee_role")
     private String refereeRole;
 
     /**
      * The performance score given to the referee based on their officiating in the match.
      */
+    @DecimalMin(value = "0.00", message = "Officiating score cannot be negative")
+    @DecimalMax(value = "10.00", message = "Officiating score cannot exceed 10.00")
     @Column(name = "officiating_score")
     private double officiatingScore;
 

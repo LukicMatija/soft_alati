@@ -1,6 +1,9 @@
 package rs.fon.bg.ac.rs.lukic_matija.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import java.util.List;
 
@@ -29,6 +32,8 @@ public class Referee {
      * The full name (first name and last name) of the referee.
      * This field is mandatory and cannot be null.
      */
+    @NotBlank(message = "Full name cannot be blank")
+    @Size(max = 100, message = "Full name cannot exceed 100 characters")
     @Column(name = "full_name", nullable = false)
     private String fullName;
 
@@ -40,6 +45,7 @@ public class Referee {
     /**
      * The experience level of the referee, typically represented in years or tier rankings.
      */
+    @Min(value = 0, message = "Experience level cannot be negative")
     @Column(name = "experience_level")
     private int experienceLevel;
 
