@@ -2,6 +2,7 @@ package rs.fon.bg.ac.rs.lukic_matija.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,18 +32,21 @@ public class Match {
     /**
      * The date and time when the match is scheduled to take place.
      */
+    @NotNull(message = "Schedule time is required")
     @Column(name = "schedule_time")
     private LocalDateTime scheduleTime;
 
     /**
      * Indicates whether the match has been played and completed.
      */
+    @NotNull(message = "Played status must be specified")
     private boolean played;
 
     /**
      * The specific phase of the tournament this match belongs to (e.g., QUARTERFINALS, SEMIFINALS, FINALS).
      * This field is mandatory and stored as a string representation in the database.
      */
+    @NotNull(message = "Match phase is required")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private MatchPhase phase;
@@ -73,6 +77,7 @@ public class Match {
      * The team designated as the host or home team for the match.
      * This field is mandatory and lazy-loaded.
      */
+    @NotNull(message = "Home team is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "home_team_id", nullable = false)
     private Team homeTeam;
@@ -81,6 +86,7 @@ public class Match {
      * The team designated as the visitor or away team for the match.
      * This field is mandatory and lazy-loaded.
      */
+    @NotNull(message = "Away team is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "away_team_id", nullable = false)
     private Team awayTeam;

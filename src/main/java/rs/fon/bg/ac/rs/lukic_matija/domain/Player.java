@@ -1,6 +1,7 @@
 package rs.fon.bg.ac.rs.lukic_matija.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 
@@ -29,6 +30,8 @@ public class Player {
      * The first name of the player.
      * This field is mandatory and cannot be null.
      */
+    @NotBlank(message = "First name cannot be blank")
+    @Size(max = 50, message = "First name cannot exceed 50 characters")
     @Column(nullable = false)
     private String firstName;
 
@@ -36,6 +39,8 @@ public class Player {
      * The last name of the player.
      * This field is mandatory and cannot be null.
      */
+    @NotBlank(message = "Last name cannot be blank")
+    @Size(max = 50, message = "Last name cannot exceed 50 characters")
     @Column(nullable = false)
     private String lastName;
 
@@ -47,6 +52,8 @@ public class Player {
     /**
      * The squad or jersey number assigned to the player within their team.
      */
+    @Min(value = 1, message = "Jersey number must be at least 1")
+    @Max(value = 99, message = "Jersey number cannot be greater than 99")
     @Column(name = "jersey_number")
     private int jerseyNumber;
 
@@ -59,6 +66,7 @@ public class Player {
      * The sports team that the player currently belongs to.
      * This field is mandatory and lazy-loaded.
      */
+    @NotNull(message = "Player must belong to a team")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id", nullable = false)
     private Team team;

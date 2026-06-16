@@ -1,6 +1,10 @@
 package rs.fon.bg.ac.rs.lukic_matija.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import java.util.List;
 
@@ -30,12 +34,15 @@ public class Tournament {
      * The official name of the tournament event.
      * This field is mandatory and cannot be null.
      */
+    @NotBlank(message = "Tournament name cannot be blank")
+    @Size(max = 150, message = "Tournament name cannot exceed 150 characters")
     @Column(nullable = false)
     private String name;
 
     /**
      * The total financial prize pool distributed among winning teams.
      */
+    @DecimalMin(value = "0.01", message = "Prize pool must be greater than 0")
     @Column(name = "prize_pool")
     private double prizePool;
 
@@ -43,6 +50,7 @@ public class Tournament {
      * The host city where the tournament events are physically located.
      * This field is mandatory and lazy-loaded.
      */
+    @NotNull(message = "Tournament must be associated with a city")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "city_id", nullable = false)
     private City city;
