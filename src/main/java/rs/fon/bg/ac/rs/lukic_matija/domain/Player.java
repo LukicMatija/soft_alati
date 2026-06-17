@@ -28,7 +28,7 @@ public class Player {
 
     /**
      * The first name of the player.
-     * This field is mandatory and cannot be null.
+     * Allowed values: Must not be null, empty, or blank. Maximum length is 50 characters.
      */
     @NotBlank(message = "First name cannot be blank")
     @Size(max = 50, message = "First name cannot exceed 50 characters")
@@ -37,7 +37,7 @@ public class Player {
 
     /**
      * The last name of the player.
-     * This field is mandatory and cannot be null.
+     * Allowed values: Must not be null, empty, or blank. Maximum length is 50 characters.
      */
     @NotBlank(message = "Last name cannot be blank")
     @Size(max = 50, message = "Last name cannot exceed 50 characters")
@@ -51,6 +51,7 @@ public class Player {
 
     /**
      * The squad or jersey number assigned to the player within their team.
+     * Allowed values: Must be an integer value between 1 and 99 inclusive.
      */
     @Min(value = 1, message = "Jersey number must be at least 1")
     @Max(value = 99, message = "Jersey number cannot be greater than 99")
@@ -59,6 +60,7 @@ public class Player {
 
     /**
      * Indicates whether the player is currently injured and unavailable for matches.
+     * Allowed values: True if injured, false if healthy.
      */
     private boolean injured;
 

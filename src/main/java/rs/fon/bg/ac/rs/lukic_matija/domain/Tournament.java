@@ -32,7 +32,7 @@ public class Tournament {
 
     /**
      * The official name of the tournament event.
-     * This field is mandatory and cannot be null.
+     * Allowed values: Must not be null, empty, or blank. Maximum length is 150 characters.
      */
     @NotBlank(message = "Tournament name cannot be blank")
     @Size(max = 150, message = "Tournament name cannot exceed 150 characters")
@@ -41,6 +41,7 @@ public class Tournament {
 
     /**
      * The total financial prize pool distributed among winning teams.
+     * Allowed values: Must be a positive financial value greater than 0.
      */
     @DecimalMin(value = "0.01", message = "Prize pool must be greater than 0")
     @Column(name = "prize_pool")

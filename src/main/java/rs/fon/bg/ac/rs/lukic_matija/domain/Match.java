@@ -31,6 +31,7 @@ public class Match {
 
     /**
      * The date and time when the match is scheduled to take place.
+     * Allowed values: Must not be null.
      */
     @NotNull(message = "Schedule time is required")
     @Column(name = "schedule_time")
@@ -38,13 +39,14 @@ public class Match {
 
     /**
      * Indicates whether the match has been played and completed.
+     * Allowed values: Cannot be null.
      */
     @NotNull(message = "Played status must be specified")
     private boolean played;
 
     /**
      * The specific phase of the tournament this match belongs to (e.g., QUARTERFINALS, SEMIFINALS, FINALS).
-     * This field is mandatory and stored as a string representation in the database.
+     * Allowed values: Must not be null. Value must be one of the MatchPhase enum constants.
      */
     @NotNull(message = "Match phase is required")
     @Enumerated(EnumType.STRING)

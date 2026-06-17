@@ -30,7 +30,7 @@ public class Referee {
 
     /**
      * The full name (first name and last name) of the referee.
-     * This field is mandatory and cannot be null.
+     * Allowed values: Must not be null, empty, or blank. Maximum length is 100 characters.
      */
     @NotBlank(message = "Full name cannot be blank")
     @Size(max = 100, message = "Full name cannot exceed 100 characters")
@@ -44,6 +44,7 @@ public class Referee {
 
     /**
      * The experience level of the referee, typically represented in years or tier rankings.
+     * Allowed values: Must be a non-negative integer value (0 or greater).
      */
     @Min(value = 0, message = "Experience level cannot be negative")
     @Column(name = "experience_level")

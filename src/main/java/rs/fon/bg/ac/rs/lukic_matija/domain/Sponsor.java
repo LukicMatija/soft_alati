@@ -32,7 +32,7 @@ public class Sponsor {
 
     /**
      * The name of the sponsoring enterprise or company.
-     * This field is mandatory and cannot be null.
+     * Allowed values: Must not be null, empty, or blank. Maximum length is 100 characters.
      */
     @NotBlank(message = "Company name cannot be blank")
     @Size(max = 100, message = "Company name cannot exceed 100 characters")
@@ -41,6 +41,7 @@ public class Sponsor {
 
     /**
      * The total financial budget allocated by the sponsor for the tournament contract.
+     * Allowed values: Must be a positive financial value greater than or equal to 0.01.
      */
     @DecimalMin(value = "0.01", message = "Contract budget must be greater than 0")
     @Column(name = "contract_budget")
@@ -48,6 +49,7 @@ public class Sponsor {
 
     /**
      * The specific date when the sponsorship agreement was officially signed.
+     * Allowed values: Must not be null.
      */
     @NotNull(message = "Signing date is required")
     @Column(name = "signing_date")
