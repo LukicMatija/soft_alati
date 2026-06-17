@@ -28,7 +28,7 @@ public class City {
 
     /**
      * The name of the city.
-     * This field is mandatory and cannot be null.
+     * Allowed values: Must not be null, empty, or blank. Maximum length is 100 characters.
      */
     @NotBlank(message = "City name cannot be blank")
     @Size(max = 100, message = "City name cannot exceed 100 characters")
@@ -37,6 +37,7 @@ public class City {
 
     /**
      * The postal or zip code associated with the city.
+     * Allowed values: Must not be null, empty, or blank. Maximum length is 5 characters.
      */
     @NotBlank(message = "Postal code cannot be blank")
     @Size(max = 5, message = "Postal code cannot exceed 5 characters")
