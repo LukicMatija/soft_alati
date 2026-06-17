@@ -32,7 +32,7 @@ public class Team {
 
     /**
      * The official name of the sports team.
-     * This field is mandatory and cannot be null.
+     * Allowed values: Must not be null, empty, or blank. Maximum length is 100 characters.
      */
     @NotBlank(message = "Team name cannot be blank")
     @Size(max = 100, message = "Team name cannot exceed 100 characters")
@@ -41,6 +41,7 @@ public class Team {
 
     /**
      * The formal founding or registration date of the club.
+     * Allowed values: Must not be null.
      */
     @NotNull(message = "Foundation date is required")
     @Column(name = "foundation_date")
@@ -48,6 +49,7 @@ public class Team {
 
     /**
      * Total number of official match victories accumulated by the team.
+     * Allowed values: Must be a non-negative integer value (0 or greater).
      */
     @Min(value = 0, message = "Wins count cannot be negative")
     @Column(name = "wins_count")
@@ -55,6 +57,7 @@ public class Team {
 
     /**
      * Total number of official match defeats accumulated by the team.
+     * Allowed values: Must be a non-negative integer value (0 or greater).
      */
     @Min(value = 0, message = "Lose count cannot be negative")
     @Column(name = "losses_count")
