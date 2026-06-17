@@ -30,6 +30,7 @@ public class Delegation {
 
     /**
      * The specific role assigned to the referee for the match (e.g., Main Referee, Assistant Referee).
+     * Allowed values: Must not be null, empty, or blank. Maximum length is 50 characters.
      */
     @NotBlank(message = "Referee role cannot be blank")
     @Size(max = 50, message = "Referee role cannot exceed 50 characters")
@@ -38,6 +39,7 @@ public class Delegation {
 
     /**
      * The performance score given to the referee based on their officiating in the match.
+     * Allowed values: Must be a decimal value between 0.00 and 10.00 inclusive.
      */
     @DecimalMin(value = "0.00", message = "Officiating score cannot be negative")
     @DecimalMax(value = "10.00", message = "Officiating score cannot exceed 10.00")
