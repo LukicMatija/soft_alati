@@ -157,4 +157,42 @@ class DelegationTest {
             assertTrue(hasMaxMessage);
         }
     }
+
+    @Test
+    @DisplayName("Should fail validation when referee is null")
+    void validate_NullReferee_ReturnsConstraintViolations() {
+        Delegation delegation = Delegation.builder()
+                .id(1L)
+                .refereeRole("MAIN_REFEREE")
+                .officiatingScore(8.5)
+                .referee(null)
+                .match(mockMatch)
+                .build();
+
+        Set<ConstraintViolation<Delegation>> violations = validator.validate(delegation);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Referee is required"));
+        assertTrue(hasCorrectMessage);
+    }
+
+    @Test
+    @DisplayName("Should fail validation when match is null")
+    void validate_NullMatch_ReturnsConstraintViolations() {
+        Delegation delegation = Delegation.builder()
+                .id(1L)
+                .refereeRole("MAIN_REFEREE")
+                .officiatingScore(8.5)
+                .referee(mockReferee)
+                .match(null)
+                .build();
+
+        Set<ConstraintViolation<Delegation>> violations = validator.validate(delegation);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Match team is required"));
+        assertTrue(hasCorrectMessage);
+    }
 }
