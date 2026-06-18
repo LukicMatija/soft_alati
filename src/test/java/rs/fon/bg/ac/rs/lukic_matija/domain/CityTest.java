@@ -10,6 +10,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 
 import java.util.List;
@@ -91,5 +93,83 @@ class CityTest {
         assertEquals("Smederevska Palank", city.getName());
         assertEquals("11420", city.getPostalCode());
         assertEquals("Serbia", city.getCountry());
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   ", "\t", "\n"})
+    @DisplayName("Should fail validation when city name is null, empty, or blank")
+    void validate_InvalidNameBlank_ReturnsConstraintViolations(String invalidName) {
+        City city = City.builder()
+                .id(1L)
+                .name(invalidName)
+                .postalCode("11000")
+                .country("Serbia")
+                .build();
+
+        Set<ConstraintViolation<City>> violations = validator.validate(city);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("City name cannot be blank"));
+        assertTrue(hasCorrectMessage);
+    }
+
+    @Test
+    @DisplayName("Should fail validation when city name exceeds 100 characters")
+    void validate_NameTooLong_ReturnsConstraintViolations() {
+        String longName = "A".repeat(101);
+
+        City city = City.builder()
+                .id(1L)
+                .name(longName)
+                .postalCode("11000")
+                .country("Serbia")
+                .build();
+
+        Set<ConstraintViolation<City>> violations = validator.validate(city);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("City name cannot exceed 100 characters"));
+        assertTrue(hasCorrectMessage);
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   ", " ", "\t"})
+    @DisplayName("Should fail validation when postal code is null, empty, or blank")
+    void validate_InvalidPostalCodeBlank_ReturnsConstraintViolations(String invalidPostalCode) {
+        City city = City.builder()
+                .id(1L)
+                .name("Belgrade")
+                .postalCode(invalidPostalCode)
+                .country("Serbia")
+                .build();
+
+        Set<ConstraintViolation<City>> violations = validator.validate(city);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Postal code cannot be blank"));
+        assertTrue(hasCorrectMessage);
+    }
+
+    @Test
+    @DisplayName("Should fail validation when postal code exceeds 5 characters")
+    void validate_PostalCodeTooLong_ReturnsConstraintViolations() {
+        City city = City.builder()
+                .id(1L)
+                .name("Belgrade")
+                .postalCode("110000")
+                .country("Serbia")
+                .build();
+
+        Set<ConstraintViolation<City>> violations = validator.validate(city);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Postal code cannot exceed 5 characters"));
+        assertTrue(hasCorrectMessage);
     }
 }

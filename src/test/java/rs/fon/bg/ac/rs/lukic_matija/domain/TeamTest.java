@@ -10,6 +10,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 
 import java.time.LocalDate;
@@ -105,5 +107,131 @@ class TeamTest {
         assertEquals(9L, team.getId());
         assertEquals("Partizan", team.getName());
         assertEquals(100, team.getWinsCount());
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   ", "\t", "\n"})
+    @DisplayName("Should fail validation when team name is null, empty, or blank")
+    void validate_InvalidNameBlank_ReturnsConstraintViolations(String invalidName) {
+        Team team = Team.builder()
+                .id(1L)
+                .name(invalidName)
+                .foundationDate(LocalDate.now())
+                .winsCount(10)
+                .lossesCount(5)
+                .city(mockCity)
+                .build();
+
+        Set<ConstraintViolation<Team>> violations = validator.validate(team);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Team name cannot be blank"));
+        assertTrue(hasCorrectMessage);
+    }
+
+    @Test
+    @DisplayName("Should fail validation when team name exceeds 100 characters")
+    void validate_NameTooLong_ReturnsConstraintViolations() {
+        String longName = "A".repeat(101);
+
+        Team team = Team.builder()
+                .id(1L)
+                .name(longName)
+                .foundationDate(LocalDate.now())
+                .winsCount(10)
+                .lossesCount(5)
+                .city(mockCity)
+                .build();
+
+        Set<ConstraintViolation<Team>> violations = validator.validate(team);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Team name cannot exceed 100 characters"));
+        assertTrue(hasCorrectMessage);
+    }
+
+    @Test
+    @DisplayName("Should fail validation when foundation date is null")
+    void validate_NullFoundationDate_ReturnsConstraintViolations() {
+        Team team = Team.builder()
+                .id(1L)
+                .name("Partizan")
+                .foundationDate(null)
+                .winsCount(10)
+                .lossesCount(5)
+                .city(mockCity)
+                .build();
+
+        Set<ConstraintViolation<Team>> violations = validator.validate(team);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Foundation date is required"));
+        assertTrue(hasCorrectMessage);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {-1, -5, -100})
+    @DisplayName("Should fail validation when wins count is strictly negative")
+    void validate_InvalidWinsCount_ReturnsConstraintViolations(int invalidWins) {
+        Team team = Team.builder()
+                .id(1L)
+                .name("Partizan")
+                .foundationDate(LocalDate.now())
+                .winsCount(invalidWins)
+                .lossesCount(5)
+                .city(mockCity)
+                .build();
+
+        Set<ConstraintViolation<Team>> violations = validator.validate(team);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Wins count cannot be negative"));
+        assertTrue(hasCorrectMessage);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {-1, -10, -50})
+    @DisplayName("Should fail validation when losses count is strictly negative")
+    void validate_InvalidLossesCount_ReturnsConstraintViolations(int invalidLosses) {
+        Team team = Team.builder()
+                .id(1L)
+                .name("Partizan")
+                .foundationDate(LocalDate.now())
+                .winsCount(10)
+                .lossesCount(invalidLosses)
+                .city(mockCity)
+                .build();
+
+        Set<ConstraintViolation<Team>> violations = validator.validate(team);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Lose count cannot be negative"));
+        assertTrue(hasCorrectMessage);
+    }
+
+    @Test
+    @DisplayName("Should fail validation when city relation is null")
+    void validate_NullCity_ReturnsConstraintViolations() {
+        Team team = Team.builder()
+                .id(1L)
+                .name("Partizan")
+                .foundationDate(LocalDate.now())
+                .winsCount(10)
+                .lossesCount(5)
+                .city(null)
+                .build();
+
+        Set<ConstraintViolation<Team>> violations = validator.validate(team);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Team must be associated with a city"));
+        assertTrue(hasCorrectMessage);
     }
 }

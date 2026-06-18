@@ -59,6 +59,7 @@ public class Sponsor {
      * The tournament backed by this sponsorship agreement.
      * This field is mandatory and lazy-loaded.
      */
+    @NotNull(message = "Tournament is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tournament_id", nullable = false)
     private Tournament tournament;

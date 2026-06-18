@@ -1,10 +1,7 @@
 package rs.fon.bg.ac.rs.lukic_matija.domain;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 
@@ -50,6 +47,7 @@ public class Delegation {
      * The referee assigned to this specific match delegation.
      * This field is mandatory and cannot be null.
      */
+    @NotNull(message = "Referee is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "referee_id", nullable = false)
     private Referee referee;
@@ -58,6 +56,7 @@ public class Delegation {
      * The match to which the referee is being delegated.
      * This field is mandatory and cannot be null.
      */
+    @NotNull(message = "Match team is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "match_id", nullable = false)
     private Match match;

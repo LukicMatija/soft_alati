@@ -10,6 +10,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 
 import java.util.Set;
@@ -85,5 +87,112 @@ class DelegationTest {
         assertEquals(55L, delegation.getId());
         assertEquals("LINESMAN", delegation.getRefereeRole());
         assertEquals(6.5, delegation.getOfficiatingScore());
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   ", "\t", "\n"})
+    @DisplayName("Should fail validation when referee role is null, empty, or blank")
+    void validate_InvalidRefereeRoleBlank_ReturnsConstraintViolations(String invalidRole) {
+        Delegation delegation = Delegation.builder()
+                .id(1L)
+                .refereeRole(invalidRole)
+                .officiatingScore(8.5)
+                .referee(mockReferee)
+                .match(mockMatch)
+                .build();
+
+        Set<ConstraintViolation<Delegation>> violations = validator.validate(delegation);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Referee role cannot be blank"));
+        assertTrue(hasCorrectMessage);
+    }
+
+    @Test
+    @DisplayName("Should fail validation when referee role exceeds 50 characters")
+    void validate_RefereeRoleTooLong_ReturnsConstraintViolations() {
+        String longRole = "R".repeat(51);
+
+        Delegation delegation = Delegation.builder()
+                .id(1L)
+                .refereeRole(longRole)
+                .officiatingScore(8.5)
+                .referee(mockReferee)
+                .match(mockMatch)
+                .build();
+
+        Set<ConstraintViolation<Delegation>> violations = validator.validate(delegation);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Referee role cannot exceed 50 characters"));
+        assertTrue(hasCorrectMessage);
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {-0.01, -5.0, 10.01, 15.5})
+    @DisplayName("Should fail validation when officiating score is out of bounds")
+    void validate_InvalidOfficiatingScoreBounds_ReturnsConstraintViolations(double invalidScore) {
+        Delegation delegation = Delegation.builder()
+                .id(1L)
+                .refereeRole("MAIN_REFEREE")
+                .officiatingScore(invalidScore)
+                .referee(mockReferee)
+                .match(mockMatch)
+                .build();
+
+        Set<ConstraintViolation<Delegation>> violations = validator.validate(delegation);
+
+        assertFalse(violations.isEmpty());
+
+        if (invalidScore < 0.00) {
+            boolean hasMinMessage = violations.stream()
+                    .anyMatch(v -> v.getMessage().equals("Officiating score cannot be negative"));
+            assertTrue(hasMinMessage);
+        } else {
+            boolean hasMaxMessage = violations.stream()
+                    .anyMatch(v -> v.getMessage().equals("Officiating score cannot exceed 10.00"));
+            assertTrue(hasMaxMessage);
+        }
+    }
+
+    @Test
+    @DisplayName("Should fail validation when referee is null")
+    void validate_NullReferee_ReturnsConstraintViolations() {
+        Delegation delegation = Delegation.builder()
+                .id(1L)
+                .refereeRole("MAIN_REFEREE")
+                .officiatingScore(8.5)
+                .referee(null)
+                .match(mockMatch)
+                .build();
+
+        Set<ConstraintViolation<Delegation>> violations = validator.validate(delegation);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Referee is required"));
+        assertTrue(hasCorrectMessage);
+    }
+
+    @Test
+    @DisplayName("Should fail validation when match is null")
+    void validate_NullMatch_ReturnsConstraintViolations() {
+        Delegation delegation = Delegation.builder()
+                .id(1L)
+                .refereeRole("MAIN_REFEREE")
+                .officiatingScore(8.5)
+                .referee(mockReferee)
+                .match(null)
+                .build();
+
+        Set<ConstraintViolation<Delegation>> violations = validator.validate(delegation);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Match team is required"));
+        assertTrue(hasCorrectMessage);
     }
 }
