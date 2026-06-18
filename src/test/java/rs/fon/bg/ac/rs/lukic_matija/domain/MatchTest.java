@@ -145,4 +145,92 @@ class MatchTest {
         assertEquals(MatchPhase.QUARTERFINALS, match.getPhase());
         assertFalse(match.isPlayed());
     }
+
+    @Test
+    @DisplayName("Should fail validation when schedule time is null")
+    void validate_NullScheduleTime_ReturnsConstraintViolations() {
+        Match match = Match.builder()
+                .scheduleTime(null)
+                .played(false)
+                .phase(MatchPhase.QUARTERFINALS)
+                .homePoints(0)
+                .awayPoints(0)
+                .tournament(mockTournament)
+                .homeTeam(mockHomeTeam)
+                .awayTeam(mockAwayTeam)
+                .build();
+
+        Set<ConstraintViolation<Match>> violations = validator.validate(match);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Schedule time is required"));
+        assertTrue(hasCorrectMessage);
+    }
+
+    @Test
+    @DisplayName("Should fail validation when match phase is null")
+    void validate_NullPhase_ReturnsConstraintViolations() {
+        Match match = Match.builder()
+                .scheduleTime(LocalDateTime.now())
+                .played(false)
+                .phase(null)
+                .homePoints(0)
+                .awayPoints(0)
+                .tournament(mockTournament)
+                .homeTeam(mockHomeTeam)
+                .awayTeam(mockAwayTeam)
+                .build();
+
+        Set<ConstraintViolation<Match>> violations = validator.validate(match);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Match phase is required"));
+        assertTrue(hasCorrectMessage);
+    }
+
+    @Test
+    @DisplayName("Should fail validation when home team is null")
+    void validate_NullHomeTeam_ReturnsConstraintViolations() {
+        Match match = Match.builder()
+                .scheduleTime(LocalDateTime.now())
+                .played(false)
+                .phase(MatchPhase.FINALS)
+                .homePoints(0)
+                .awayPoints(0)
+                .tournament(mockTournament)
+                .homeTeam(null)
+                .awayTeam(mockAwayTeam)
+                .build();
+
+        Set<ConstraintViolation<Match>> violations = validator.validate(match);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Home team is required"));
+        assertTrue(hasCorrectMessage);
+    }
+
+    @Test
+    @DisplayName("Should fail validation when away team is null")
+    void validate_NullAwayTeam_ReturnsConstraintViolations() {
+        Match match = Match.builder()
+                .scheduleTime(LocalDateTime.now())
+                .played(false)
+                .phase(MatchPhase.FINALS)
+                .homePoints(0)
+                .awayPoints(0)
+                .tournament(mockTournament)
+                .homeTeam(mockHomeTeam)
+                .awayTeam(null)
+                .build();
+
+        Set<ConstraintViolation<Match>> violations = validator.validate(match);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Away team is required"));
+        assertTrue(hasCorrectMessage);
+    }
 }
