@@ -10,6 +10,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 
 import java.util.List;
@@ -84,5 +86,67 @@ class RefereeTest {
         assertEquals(10L, referee.getId());
         assertEquals("Novak Simovic", referee.getFullName());
         assertEquals(10, referee.getExperienceLevel());
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   ", "\t", "\n"})
+    @DisplayName("Should fail validation when full name is null, empty, or blank")
+    void validate_InvalidFullNameBlank_ReturnsConstraintViolations(String invalidFullName) {
+        Referee referee = Referee.builder()
+                .id(1L)
+                .fullName(invalidFullName)
+                .license("FIFA Badge")
+                .experienceLevel(10)
+                .delegations(mockDelegations)
+                .build();
+
+        Set<ConstraintViolation<Referee>> violations = validator.validate(referee);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Full name cannot be blank"));
+        assertTrue(hasCorrectMessage);
+    }
+
+    @Test
+    @DisplayName("Should fail validation when full name exceeds 100 characters")
+    void validate_FullNameTooLong_ReturnsConstraintViolations() {
+        String longFullName = "A".repeat(101);
+
+        Referee referee = Referee.builder()
+                .id(1L)
+                .fullName(longFullName)
+                .license("FIFA Badge")
+                .experienceLevel(10)
+                .delegations(mockDelegations)
+                .build();
+
+        Set<ConstraintViolation<Referee>> violations = validator.validate(referee);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Full name cannot exceed 100 characters"));
+        assertTrue(hasCorrectMessage);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {-1, -5, -100})
+    @DisplayName("Should fail validation when experience level is strictly negative")
+    void validate_InvalidExperienceLevel_ReturnsConstraintViolations(int invalidExperience) {
+        Referee referee = Referee.builder()
+                .id(1L)
+                .fullName("Srdjan Jovanovic")
+                .license("FIFA Badge")
+                .experienceLevel(invalidExperience)
+                .delegations(mockDelegations)
+                .build();
+
+        Set<ConstraintViolation<Referee>> violations = validator.validate(referee);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Experience level cannot be negative"));
+        assertTrue(hasCorrectMessage);
     }
 }
