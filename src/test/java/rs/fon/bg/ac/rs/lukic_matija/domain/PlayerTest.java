@@ -10,6 +10,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 
 import java.util.Set;
@@ -73,7 +75,7 @@ class PlayerTest {
         assertEquals(22, player.getJerseyNumber());
         assertFalse(player.isInjured());
 
-        // Provera @ManyToOne veze sa timom
+
         assertEquals(mockTeam, player.getTeam());
     }
 
@@ -92,5 +94,135 @@ class PlayerTest {
         assertEquals("Bibars", player.getFirstName());
         assertEquals("Natcho", player.getLastName());
         assertEquals(10, player.getJerseyNumber());
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   ", "\t", "\n"})
+    @DisplayName("Should fail validation when first name is null, empty, or blank")
+    void validate_InvalidFirstNameBlank_ReturnsConstraintViolations(String invalidFirstName) {
+        Player player = Player.builder()
+                .id(1L)
+                .firstName(invalidFirstName)
+                .lastName("Mitrovic")
+                .jerseyNumber(9)
+                .team(mockTeam)
+                .build();
+
+        Set<ConstraintViolation<Player>> violations = validator.validate(player);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("First name cannot be blank"));
+        assertTrue(hasCorrectMessage);
+    }
+
+    @Test
+    @DisplayName("Should fail validation when first name exceeds 50 characters")
+    void validate_FirstNameTooLong_ReturnsConstraintViolations() {
+        String longFirstName = "A".repeat(51);
+
+        Player player = Player.builder()
+                .id(1L)
+                .firstName(longFirstName)
+                .lastName("Mitrovic")
+                .jerseyNumber(9)
+                .team(mockTeam)
+                .build();
+
+        Set<ConstraintViolation<Player>> violations = validator.validate(player);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("First name cannot exceed 50 characters"));
+        assertTrue(hasCorrectMessage);
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"   ", "\t", "\n"})
+    @DisplayName("Should fail validation when last name is null, empty, or blank")
+    void validate_InvalidLastNameBlank_ReturnsConstraintViolations(String invalidLastName) {
+        Player player = Player.builder()
+                .id(1L)
+                .firstName("Aleksandar")
+                .lastName(invalidLastName)
+                .jerseyNumber(9)
+                .team(mockTeam)
+                .build();
+
+        Set<ConstraintViolation<Player>> violations = validator.validate(player);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Last name cannot be blank"));
+        assertTrue(hasCorrectMessage);
+    }
+
+    @Test
+    @DisplayName("Should fail validation when last name exceeds 50 characters")
+    void validate_LastNameTooLong_ReturnsConstraintViolations() {
+        String longLastName = "A".repeat(51);
+
+        Player player = Player.builder()
+                .id(1L)
+                .firstName("Aleksandar")
+                .lastName(longLastName)
+                .jerseyNumber(9)
+                .team(mockTeam)
+                .build();
+
+        Set<ConstraintViolation<Player>> violations = validator.validate(player);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Last name cannot exceed 50 characters"));
+        assertTrue(hasCorrectMessage);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, -5, 100, 150})
+    @DisplayName("Should fail validation when jersey number is out of bounds")
+    void validate_InvalidJerseyNumberBounds_ReturnsConstraintViolations(int invalidJerseyNumber) {
+        Player player = Player.builder()
+                .id(1L)
+                .firstName("Aleksandar")
+                .lastName("Mitrovic")
+                .jerseyNumber(invalidJerseyNumber)
+                .team(mockTeam)
+                .build();
+
+        Set<ConstraintViolation<Player>> violations = validator.validate(player);
+
+        assertFalse(violations.isEmpty());
+
+        if (invalidJerseyNumber < 1) {
+            boolean hasMinMessage = violations.stream()
+                    .anyMatch(v -> v.getMessage().equals("Jersey number must be at least 1"));
+            assertTrue(hasMinMessage);
+        } else {
+            boolean hasMaxMessage = violations.stream()
+                    .anyMatch(v -> v.getMessage().equals("Jersey number cannot be greater than 99"));
+            assertTrue(hasMaxMessage);
+        }
+    }
+
+    @Test
+    @DisplayName("Should fail validation when team is null")
+    void validate_NullTeam_ReturnsConstraintViolations() {
+        Player player = Player.builder()
+                .id(1L)
+                .firstName("Aleksandar")
+                .lastName("Mitrovic")
+                .jerseyNumber(9)
+                .team(null)
+                .build();
+
+        Set<ConstraintViolation<Player>> violations = validator.validate(player);
+
+        assertFalse(violations.isEmpty());
+        boolean hasCorrectMessage = violations.stream()
+                .anyMatch(v -> v.getMessage().equals("Player must belong to a team"));
+        assertTrue(hasCorrectMessage);
     }
 }
